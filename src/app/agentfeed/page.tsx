@@ -17,8 +17,15 @@ export default function FeedPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1); // Pagination state
+  const [isClient, setIsClient] = useState<boolean>(false); // Ensure it's mounted on the client
 
-  const router = useRouter();
+  const [router, setRouter] = useState<any>(null);
+
+  // Set router client-side to prevent issues during SSR
+  useEffect(() => {
+    setIsClient(true); // Set to true after mounting to ensure client-side rendering
+    setRouter(useRouter()); // Initialize router client-side
+  }, []);
 
   // Fetch jobs data with pagination
   const fetchJobs = async (page: number) => {
@@ -53,8 +60,14 @@ export default function FeedPage() {
 
   // Initial fetch when component mounts
   useEffect(() => {
-    fetchJobs(page);
-  }, [page]);
+    if (isClient) {
+      fetchJobs(page);
+    }
+  }, [page, isClient]);
+
+  if (!isClient) {
+    return null; // Prevent rendering the component until after the client mounts
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-indigo-200 py-8 px-4">
