@@ -1,7 +1,61 @@
-import React from 'react';
+'use client';
+
+import { useState } from 'react';
 import Image from "next/image";
 
-export default function Home() {
+const Home = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  // Your preset username and password
+  const presetUsername = 'DaltonFincher';
+  const presetPassword = '6006098938Dalton$';
+
+  // Handle form submission
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Check if the entered username and password match the preset values
+    if (username === presetUsername && password === presetPassword) {
+      setLoggedIn(true);
+      setError('');
+    } else {
+      setError('Invalid username or password');
+    }
+  };
+
+  if (!loggedIn) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
+        <form onSubmit={handleSignIn} className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+          <h2 className="text-xl font-semibold mb-4 text-black">Login</h2> {/* Changed the color to black */}
+          {error && <p className="text-red-500">{error}</p>}
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full p-2 border rounded-lg mb-4"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 border rounded-lg mb-4"
+            required
+          />
+          <button type="submit" className="w-full py-2 bg-blue-500 text-white rounded-lg">
+            Log In
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white text-black">
       {/* Header */}
@@ -113,4 +167,6 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+};
+
+export default Home;
