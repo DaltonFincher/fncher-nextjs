@@ -1,28 +1,28 @@
 'use client';
 
 import { useEffect } from 'react';
-import { supabase } from '@utils/supabaseClient';
+import { supabase } from '@utils/supabaseClient'; // Adjust path as necessary
 
 export default function EmailConfirmationListener() {
     useEffect(() => {
         // Listen to auth state changes to handle email verification
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
                 // Check if the email is confirmed after sign-in
                 const email = session?.user?.email;
 
                 if (email) {
                     try {
-                        // Update the pending_agents table to mark email_verified as true
+                        // Update the pending_agents table to mark email_verified as true and change status to 'verified'
                         const { data, error } = await supabase
                             .from('pending_agents')
-                            .update({ email_verified: true })
+                            .update({ email_verified: true, status: 'verified' })
                             .eq('email', email); // Match the email
 
                         if (error) {
-                            console.error('Error updating email_verified:', error);
+                            console.error('Error updating pending_agents:', error);
                         } else {
-                            console.log('Successfully updated email_verified for agent:', email);
+                            console.log('Successfully updated pending_agents for agent:', email);
                         }
                     } catch (error) {
                         console.error('Error handling email verification:', error);
@@ -33,7 +33,7 @@ export default function EmailConfirmationListener() {
 
         return () => {
             // Cleanup listener on component unmount
-            subscription?.unsubscribe(); // Correctly unsubscribe using subscription
+            authListener?.subscription?.unsubscribe(); // Correct way to unsubscribe
         };
     }, []);
 
