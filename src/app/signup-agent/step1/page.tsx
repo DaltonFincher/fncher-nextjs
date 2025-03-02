@@ -6,7 +6,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
-    licenseType: string; // New state to manage the license type (SL, BL)
+    licenseType: string; // State for license type (SL, BL)
     licenseNumber: string;
     email: string;
     password: string;
@@ -47,14 +47,14 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        const fullLicenseNumber = `${licenseType}${licenseNumber}`; // Combine the license type and number
+        const fullLicenseNumber = `${licenseType}${licenseNumber}`; // Combine license type and number
 
         // Sign up the user with email confirmation
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                emailRedirectTo: `${window.location.origin}/verify-email`
+                emailRedirectTo: `${window.location.origin}/confirm-email` // The redirect URL after email verification
             }
         });
 
@@ -69,14 +69,14 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        // Save to pending_agents table
+        // Save agent data to the pending_agents table
         const { error: insertError } = await supabase
             .from('pending_agents')
             .insert([{
                 email,
                 full_name: fullName,
-                license_number: fullLicenseNumber, // Save the combined license number
-                profile_picture: "", // Placeholder, to be updated later
+                license_number: fullLicenseNumber, // Save combined license number
+                profile_picture: "", // Placeholder for now
                 agent_id: userId,
                 status: 'pending',
                 terms_accepted: true,

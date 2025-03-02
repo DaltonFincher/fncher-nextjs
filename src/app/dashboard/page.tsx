@@ -12,7 +12,7 @@ interface Agent {
 }
 
 export default function Dashboard() {
-    const [pendingAgents, setPendingAgents] = useState<Agent[]>([]);
+    const [pendingAgents, setPendingAgents] = useState<Agent[]>([]); // Pending agents state
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState<string | null>(null); // Error state
     const [user, setUser] = useState<any>(null); // Store authenticated user
@@ -20,7 +20,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchPendingAgents();
-        getAuthenticatedUser();
+        getAuthenticatedUser(); // Fetch user session when the component mounts
     }, []); // Only fetch on mount
 
     // Fetch the authenticated user session
@@ -32,11 +32,11 @@ export default function Dashboard() {
                 throw error;
             }
 
-            setUser(data.user);
+            setUser(data.user); // Set the user if session exists
         } catch (err) {
             console.error('Error fetching user:', err);
         } finally {
-            setAuthLoading(false);
+            setAuthLoading(false); // Set auth loading to false after checking session
         }
     }
 
@@ -67,6 +67,7 @@ export default function Dashboard() {
         }
     }
 
+    // Handle agent verification and move from pending_agents to agents
     async function handleVerify(email: string) {
         try {
             // Get the auth token
@@ -77,23 +78,55 @@ export default function Dashboard() {
                 throw new Error('User is not authenticated.');
             }
 
-            const response = await fetch('/api/verify-agent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Send the token in the header
-                },
-                body: JSON.stringify({ email }), // Send the email of the agent to verify
-            });
+            // Fetch the pending agent's data from the pending_agents table
+            const { data: pendingAgent, error: fetchError } = await supabase
+                .from('pending_agents')
+                .select('*')
+                .eq('email', email)
+                .single(); // Fetch only one agent by email
 
-            const result = await response.json();
-
-            if (response.ok) {
-                alert(result.message); // Success message
-                fetchPendingAgents();  // Refresh list after verifying
-            } else {
-                alert(`Failed to verify agent: ${result.error}`); // Error message
+            if (fetchError) {
+                throw fetchError;
             }
+
+            if (!pendingAgent) {
+                throw new Error('Agent not found in pending_agents.');
+            }
+
+            // Move the agent to the "agents" table
+            const { error: insertError } = await supabase
+                .from('agents')
+                .insert([{
+                    full_name: pendingAgent.full_name,
+                    email: pendingAgent.email,
+                    license_number: pendingAgent.license_number,
+                    profile_picture: pendingAgent.profile_picture,
+                    status: 'active',  // Assuming the agent status is 'active' when they are verified
+                    terms_accepted: pendingAgent.terms_accepted,
+                    privacy_policy_accepted: pendingAgent.privacy_policy_accepted,
+                    created_at: pendingAgent.created_at,
+                    agent_id: pendingAgent.agent_id,  // Keep the agent's ID from the pending_agents table
+                }]);
+
+            if (insertError) {
+                throw insertError;
+            }
+
+            // Delete the agent from the "pending_agents" table after successfully inserting into "agents"
+            const { error: deleteError } = await supabase
+                .from('pending_agents')
+                .delete()
+                .eq('email', email);
+
+            if (deleteError) {
+                throw deleteError;
+            }
+
+            alert('Agent successfully verified and moved to agents.');
+
+            // Refresh the list of pending agents
+            fetchPendingAgents();
+
         } catch (error: any) {
             alert(`Failed to verify agent: ${error.message}`);
         }
