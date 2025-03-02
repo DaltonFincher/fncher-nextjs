@@ -1,61 +1,8 @@
-'use client';
-
-import { useState } from 'react';
+import React from 'react';
 import Image from "next/image";
 
-const Home = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loggedIn, setLoggedIn] = useState(false);
 
-  // Your preset username and password
-  const presetUsername = 'DaltonFincher';
-  const presetPassword = '6006098938Dalton$';
-
-  // Handle form submission
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Check if the entered username and password match the preset values
-    if (username === presetUsername && password === presetPassword) {
-      setLoggedIn(true);
-      setError('');
-    } else {
-      setError('Invalid username or password');
-    }
-  };
-
-  if (!loggedIn) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-        <form onSubmit={handleSignIn} className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-          <h2 className="text-xl font-semibold mb-4 text-black">Login</h2> {/* Changed the color to black */}
-          {error && <p className="text-red-500">{error}</p>}
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-2 border rounded-lg mb-4"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded-lg mb-4"
-            required
-          />
-          <button type="submit" className="w-full py-2 bg-blue-500 text-white rounded-lg">
-            Log In
-          </button>
-        </form>
-      </div>
-    );
-  }
-
+export default function Home() {
   return (
     <div className="bg-white text-black">
       {/* Header */}
@@ -74,6 +21,7 @@ const Home = () => {
         </div>
       </header>
 
+
       {/* Hero Section with Parallax Background */}
       <section
         className="relative text-white text-center flex flex-col justify-center items-center h-[85vh] px-6 bg-cover bg-center"
@@ -85,6 +33,7 @@ const Home = () => {
         {/* Darker Overlay for Better Readability */}
         <div className="absolute inset-0 bg-black bg-opacity-70"></div>
 
+
         {/* Hero Content */}
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h2 className="text-6xl font-extrabold leading-tight">Homeowners, Meet Verified Local Experts</h2>
@@ -92,8 +41,10 @@ const Home = () => {
             Need help while you're away? <strong>Fncher connects homeowners with licensed, trusted real estate agents</strong> who provide home care, pet sitting, and more—so you can leave with confidence.
           </p>
 
+
           {/* Sign-Up Options */}
           <h3 className="text-3xl font-bold mt-8">Sign Up As</h3>
+
 
           <div className="mt-6 flex flex-col sm:flex-row gap-6 justify-center">
             {/* Homeowner Sign-Up Button */}
@@ -103,6 +54,7 @@ const Home = () => {
             >
               Homeowner
             </a>
+
 
             {/* Agent Sign-Up Button */}
             <a
@@ -115,6 +67,7 @@ const Home = () => {
         </div>
       </section>
 
+
       {/* How Homeowners Benefit */}
       <section id="how-it-works" className="py-24 px-6 text-center">
         <div className="max-w-4xl mx-auto">
@@ -124,6 +77,7 @@ const Home = () => {
           </p>
         </div>
       </section>
+
 
       {/* Homeowner Trust Section */}
       <section id="why-trust" className="bg-[#f7f7f7] py-24 px-6 text-center">
@@ -135,6 +89,7 @@ const Home = () => {
         </div>
       </section>
 
+
       {/* Mission Section */}
       <section id="mission" className="py-24 px-6 text-center">
         <div className="max-w-4xl mx-auto">
@@ -144,6 +99,7 @@ const Home = () => {
           </p>
         </div>
       </section>
+
 
       {/* Contact Section */}
       <section id="contact" className="bg-[#5C76A3] text-white text-center py-24 px-6">
@@ -159,6 +115,7 @@ const Home = () => {
         </a>
       </section>
 
+
       {/* Footer */}
       <footer className="bg-gray-900 text-white text-center py-6">
         <p className="text-sm">
@@ -167,6 +124,6 @@ const Home = () => {
       </footer>
     </div>
   );
-};
+}
 
-export default Home;
+
