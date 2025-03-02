@@ -9,6 +9,7 @@ interface Agent {
     email: string;
     license_number: string;
     created_at: string;
+    email_verified: boolean; // Add email_verified to track verification status
 }
 
 export default function Dashboard() {
@@ -93,6 +94,11 @@ export default function Dashboard() {
                 throw new Error('Agent not found in pending_agents.');
             }
 
+            // Check if the agent's email is verified
+            if (!pendingAgent.email_verified) {
+                throw new Error('Agent email is not verified.');
+            }
+
             // Move the agent to the "agents" table
             const { error: insertError } = await supabase
                 .from('agents')
@@ -107,6 +113,7 @@ export default function Dashboard() {
                     created_at: pendingAgent.created_at,
                     agent_id: pendingAgent.agent_id,  // Keep the agent's ID from the pending_agents table
                 }]);
+
 
             if (insertError) {
                 throw insertError;
@@ -154,12 +161,16 @@ export default function Dashboard() {
                                 <p className="text-lg font-medium">{agent.full_name}</p>
                                 <p className="text-sm text-gray-400">{agent.email}</p>
                                 <p className="text-sm text-gray-400">License: {agent.license_number}</p>
+                                <p className="text-sm text-gray-400">
+                                    {agent.email_verified ? 'Email Verified' : 'Email Not Verified'}
+                                </p>
                             </div>
                             <button
                                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                                 onClick={() => handleVerify(agent.email)}
+                                disabled={agent.email_verified} // Disable the verify button if email is already verified
                             >
-                                Verify
+                                {agent.email_verified ? 'Verified' : 'Verify'}
                             </button>
                         </li>
                     ))}
