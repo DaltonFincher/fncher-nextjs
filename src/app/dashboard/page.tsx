@@ -9,11 +9,10 @@ interface Agent {
     email: string;
     license_number: string;
     created_at: string;
-    email_verified_at: string | null; // Store email_verified_at as a timestamp or null
 }
 
 export default function Dashboard() {
-    const [pendingAgents, setPendingAgents] = useState<Agent[]>([]); // Pending agents state
+    const [pendingAgents, setPendingAgents] = useState<Agent[]>([]);
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState<string | null>(null); // Error state
     const [user, setUser] = useState<any>(null); // Store authenticated user
@@ -21,7 +20,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchPendingAgents();
-        getAuthenticatedUser(); // Fetch user session when the component mounts
+        getAuthenticatedUser();
     }, []); // Only fetch on mount
 
     // Fetch the authenticated user session
@@ -33,11 +32,11 @@ export default function Dashboard() {
                 throw error;
             }
 
-            setUser(data.user); // Set the user if session exists
+            setUser(data.user);
         } catch (err) {
             console.error('Error fetching user:', err);
         } finally {
-            setAuthLoading(false); // Set auth loading to false after checking session
+            setAuthLoading(false);
         }
     }
 
@@ -47,7 +46,7 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('pending_agents')
                 .select('*')
-                .is('email_verified_at', null);  // Fetch agents whose email is NOT verified (email_verified_at is null)
+                .eq('status', 'pending');  // Fetch only pending agents from the "pending_agents" table
 
             if (error) {
                 throw error;  // Throw if there's an error fetching from Supabase
@@ -68,7 +67,6 @@ export default function Dashboard() {
         }
     }
 
-    // Handle agent verification and move from pending_agents to agents
     async function handleVerify(email: string) {
         try {
             // Get the auth token
@@ -79,60 +77,23 @@ export default function Dashboard() {
                 throw new Error('User is not authenticated.');
             }
 
-            // Fetch the pending agent's data from the pending_agents table
-            const { data: pendingAgent, error: fetchError } = await supabase
-                .from('pending_agents')
-                .select('*')
-                .eq('email', email)
-                .single(); // Fetch only one agent by email
+            const response = await fetch('/api/verify-agent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Send the token in the header
+                },
+                body: JSON.stringify({ email }), // Send the email of the agent to verify
+            });
 
-            if (fetchError) {
-                throw fetchError;
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message); // Success message
+                fetchPendingAgents();  // Refresh list after verifying
+            } else {
+                alert(`Failed to verify agent: ${result.error}`); // Error message
             }
-
-            if (!pendingAgent) {
-                throw new Error('Agent not found in pending_agents.');
-            }
-
-            // Check if the agent's email is verified
-            if (!pendingAgent.email_verified_at) {
-                throw new Error('Agent email is not verified.');
-            }
-
-            // Move the agent to the "agents" table
-            const { error: insertError } = await supabase
-                .from('agents')
-                .insert([{
-                    full_name: pendingAgent.full_name,
-                    email: pendingAgent.email,
-                    license_number: pendingAgent.license_number,
-                    profile_picture: pendingAgent.profile_picture,
-                    status: 'active',  // Assuming the agent status is 'active' when they are verified
-                    terms_accepted: pendingAgent.terms_accepted,
-                    privacy_policy_accepted: pendingAgent.privacy_policy_accepted,
-                    created_at: pendingAgent.created_at,
-                    agent_id: pendingAgent.agent_id,  // Keep the agent's ID from the pending_agents table
-                }]);
-
-            if (insertError) {
-                throw insertError;
-            }
-
-            // Delete the agent from the "pending_agents" table after successfully inserting into "agents"
-            const { error: deleteError } = await supabase
-                .from('pending_agents')
-                .delete()
-                .eq('email', email);
-
-            if (deleteError) {
-                throw deleteError;
-            }
-
-            alert('Agent successfully verified and moved to agents.');
-
-            // Refresh the list of pending agents
-            fetchPendingAgents();
-
         } catch (error: any) {
             alert(`Failed to verify agent: ${error.message}`);
         }
@@ -160,16 +121,12 @@ export default function Dashboard() {
                                 <p className="text-lg font-medium">{agent.full_name}</p>
                                 <p className="text-sm text-gray-400">{agent.email}</p>
                                 <p className="text-sm text-gray-400">License: {agent.license_number}</p>
-                                <p className="text-sm text-gray-400">
-                                    {agent.email_verified_at ? 'Email Verified' : 'Email Not Verified'}
-                                </p>
                             </div>
                             <button
                                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                                 onClick={() => handleVerify(agent.email)}
-                                disabled={!!agent.email_verified_at} // Disable the verify button if email is already verified
                             >
-                                {agent.email_verified_at ? 'Verified' : 'Verify'}
+                                Verify
                             </button>
                         </li>
                     ))}
