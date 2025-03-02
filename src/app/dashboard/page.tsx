@@ -9,7 +9,7 @@ interface Agent {
     email: string;
     license_number: string;
     created_at: string;
-    email_verified: boolean; // Add email_verified to track verification status
+    email_verified_at: string | null; // Store email_verified_at as a timestamp or null
 }
 
 export default function Dashboard() {
@@ -47,7 +47,7 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('pending_agents')
                 .select('*')
-                .eq('status', 'pending');  // Fetch only pending agents from the "pending_agents" table
+                .is('email_verified_at', null);  // Fetch agents whose email is NOT verified (email_verified_at is null)
 
             if (error) {
                 throw error;  // Throw if there's an error fetching from Supabase
@@ -95,7 +95,7 @@ export default function Dashboard() {
             }
 
             // Check if the agent's email is verified
-            if (!pendingAgent.email_verified) {
+            if (!pendingAgent.email_verified_at) {
                 throw new Error('Agent email is not verified.');
             }
 
@@ -113,7 +113,6 @@ export default function Dashboard() {
                     created_at: pendingAgent.created_at,
                     agent_id: pendingAgent.agent_id,  // Keep the agent's ID from the pending_agents table
                 }]);
-
 
             if (insertError) {
                 throw insertError;
@@ -162,15 +161,15 @@ export default function Dashboard() {
                                 <p className="text-sm text-gray-400">{agent.email}</p>
                                 <p className="text-sm text-gray-400">License: {agent.license_number}</p>
                                 <p className="text-sm text-gray-400">
-                                    {agent.email_verified ? 'Email Verified' : 'Email Not Verified'}
+                                    {agent.email_verified_at ? 'Email Verified' : 'Email Not Verified'}
                                 </p>
                             </div>
                             <button
                                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                                 onClick={() => handleVerify(agent.email)}
-                                disabled={agent.email_verified} // Disable the verify button if email is already verified
+                                disabled={!!agent.email_verified_at} // Disable the verify button if email is already verified
                             >
-                                {agent.email_verified ? 'Verified' : 'Verify'}
+                                {agent.email_verified_at ? 'Verified' : 'Verify'}
                             </button>
                         </li>
                     ))}
