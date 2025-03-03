@@ -6,7 +6,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
-    licenseType: string; // New state to manage the license type (SL, BL)
+    licenseType: string; // License type: SL, BL
     licenseNumber: string;
     email: string;
     password: string;
@@ -78,9 +78,10 @@ export default function SignupAgentStep1() {
                 license_number: fullLicenseNumber, // Save the combined license number
                 profile_picture: "", // Placeholder, to be updated later
                 agent_id: userId,
-                status: 'pending',
+                email_verified_at: null, // Add null to email_verified_at as placeholder
                 terms_accepted: true,
                 privacy_policy_accepted: true,
+                created_at: new Date().toISOString(), // Set the current timestamp
             }]);
 
         if (insertError) {
