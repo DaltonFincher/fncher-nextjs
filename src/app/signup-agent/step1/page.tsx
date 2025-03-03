@@ -6,11 +6,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
-<<<<<<< HEAD
     licenseType: string; // License type: SL, BL
-=======
-    licenseType: string; // State for license type (SL, BL)
->>>>>>> 90aefbed651b529e4af664cd053f9d930789c9c0
     licenseNumber: string;
     email: string;
     password: string;
