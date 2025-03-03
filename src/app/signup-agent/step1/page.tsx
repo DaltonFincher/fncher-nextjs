@@ -56,6 +56,7 @@ export default function SignupAgentStep1() {
 
         const fullLicenseNumber = `${licenseType}${licenseNumber}`;
 
+        // Sign up the user
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
@@ -75,13 +76,14 @@ export default function SignupAgentStep1() {
             return;
         }
 
+        // Insert data into the pending_agents table
         const { error: insertError } = await supabase
             .from('pending_agents')
             .insert([{
                 email,
                 full_name: fullName,
                 license_number: fullLicenseNumber,
-                profile_picture: "",
+                profile_picture: "",  // Assuming profile picture will be uploaded later
                 agent_id: userId,
                 email_verified_at: null,
                 terms_accepted: true,
