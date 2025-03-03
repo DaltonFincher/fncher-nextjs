@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from "react";
-import { supabase } from "../../../utils/supabaseClient";
+import { supabase } from "@utils/supabaseClient";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
-    licenseType: string; // State for license type (SL, BL)
+    licenseType: string;
     licenseNumber: string;
     email: string;
     password: string;
@@ -16,7 +16,7 @@ interface FormData {
 export default function SignupAgentStep1() {
     const [formData, setFormData] = useState<FormData>({
         fullName: "",
-        licenseType: "SL", // Default to SL
+        licenseType: "SL",
         licenseNumber: "",
         email: "",
         password: "",
@@ -43,53 +43,49 @@ export default function SignupAgentStep1() {
         const { fullName, licenseType, licenseNumber, email, password, termsAndPrivacyAccepted } = formData;
 
         if (!termsAndPrivacyAccepted) {
-            console.error("Please accept the Terms and Privacy Policy to proceed.");
+            alert("Please accept the Terms and Privacy Policy to proceed.");
             return;
         }
 
-        const fullLicenseNumber = `${licenseType}${licenseNumber}`; // Combine license type and number
+        const fullLicenseNumber = `${licenseType}${licenseNumber}`;
 
-        // Sign up the user with email confirmation
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                emailRedirectTo: `${window.location.origin}/confirm-email` // The redirect URL after email verification
+                emailRedirectTo: `${window.location.origin}/confirm-email`
             }
         });
 
         if (authError) {
-            console.error("Error during sign-up:", authError.message);
+            alert(`Error during sign-up: ${authError.message}`);
             return;
         }
 
         const userId = authData?.user?.id;
         if (!userId) {
-            console.error("User ID is missing after sign-up.");
+            alert("User ID is missing after sign-up.");
             return;
         }
 
-        // Save agent data to the pending_agents table
         const { error: insertError } = await supabase
             .from('pending_agents')
             .insert([{
                 email,
                 full_name: fullName,
-                license_number: fullLicenseNumber, // Save combined license number
-                profile_picture: "", // Placeholder for now
+                license_number: fullLicenseNumber,
+                profile_picture: "",
                 agent_id: userId,
-                status: 'pending',
                 terms_accepted: true,
                 privacy_policy_accepted: true,
             }]);
 
         if (insertError) {
-            console.error("Error saving agent data:", insertError.message);
+            alert(`Error saving agent data: ${insertError.message}`);
             return;
         }
 
-        // Redirect to the waiting page after signup
-        window.location.href = "/waiting";  // Redirect to waiting page
+        window.location.href = "/waiting";
     };
 
     return (
@@ -99,12 +95,11 @@ export default function SignupAgentStep1() {
             <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="max-w-md w-full space-y-8 bg-white bg-opacity-90 rounded-xl p-8 shadow-lg">
                     <div className="flex justify-center mb-6">
-                        <img src="/Fncherlogo1.png" alt="Fncher Logo" className="h-24" /> {/* Increased logo size */}
+                        <img src="/Fncherlogo1.png" alt="Fncher Logo" className="h-24" />
                     </div>
                     <h2 className="text-center text-3xl font-semibold text-gray-800">Sign Up as an Agent</h2>
-                    <p className="text-center text-sm text-gray-600" style={{ opacity: 0.7 }}>
-                        Please enter the same full name as it appears on your real estate license to ensure a smooth verification process.
-                        <br />
+                    <p className="text-center text-sm text-gray-600 opacity-70">
+                        Please enter the same full name as it appears on your real estate license to ensure a smooth verification process.<br />
                         Additionally, please use your work email for this sign-up.
                     </p>
                     <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -118,7 +113,7 @@ export default function SignupAgentStep1() {
                                 placeholder="Full Name"
                                 className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
                             />
-                            
+
                             <div className="flex space-x-4">
                                 <select
                                     name="licenseType"
@@ -149,6 +144,7 @@ export default function SignupAgentStep1() {
                                 placeholder="Email Address"
                                 className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
                             />
+
                             <div className="relative">
                                 <input
                                     type={passwordVisible ? "text" : "password"}
@@ -163,7 +159,11 @@ export default function SignupAgentStep1() {
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                                     onClick={() => setPasswordVisible(!passwordVisible)}
                                 >
-                                    {passwordVisible ? <EyeSlashIcon className="h-5 w-5 text-gray-600" /> : <EyeIcon className="h-5 w-5 text-gray-600" />}
+                                    {passwordVisible ? (
+                                        <EyeSlashIcon className="h-5 w-5 text-gray-600" />
+                                    ) : (
+                                        <EyeIcon className="h-5 w-5 text-gray-600" />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -182,7 +182,10 @@ export default function SignupAgentStep1() {
                             </label>
                         </div>
 
-                        <button type="submit" className="w-full py-3 px-6 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition ease-in-out duration-200">
+                        <button
+                            type="submit"
+                            className="w-full py-3 px-6 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition ease-in-out duration-200"
+                        >
                             Next
                         </button>
                     </form>
