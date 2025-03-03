@@ -96,6 +96,7 @@ export default function SignupAgentStep1() {
             return;
         }
 
+        // Redirect to waiting page
         window.location.href = "/waiting";
     };
 
