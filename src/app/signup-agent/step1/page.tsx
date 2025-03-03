@@ -6,7 +6,11 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
+<<<<<<< HEAD
     licenseType: string;
+=======
+    licenseType: string; // License type: SL, BL
+>>>>>>> b3302f9c440a8230214af16e911f06217757e157
     licenseNumber: string;
     email: string;
     password: string;
@@ -76,8 +80,13 @@ export default function SignupAgentStep1() {
                 license_number: fullLicenseNumber,
                 profile_picture: "",
                 agent_id: userId,
+<<<<<<< HEAD
+=======
+                email_verified_at: null, // Add null to email_verified_at as placeholder
+>>>>>>> b3302f9c440a8230214af16e911f06217757e157
                 terms_accepted: true,
                 privacy_policy_accepted: true,
+                created_at: new Date().toISOString(), // Set the current timestamp
             }]);
 
         if (insertError) {
