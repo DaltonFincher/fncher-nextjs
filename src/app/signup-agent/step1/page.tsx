@@ -24,6 +24,7 @@ export default function SignupAgentStep1() {
     });
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,8 +43,14 @@ export default function SignupAgentStep1() {
 
         const { fullName, licenseType, licenseNumber, email, password, termsAndPrivacyAccepted } = formData;
 
+        // Basic validation for required fields
+        if (!fullName || !licenseNumber || !email || !password) {
+            setErrorMessage("Please fill in all required fields.");
+            return;
+        }
+
         if (!termsAndPrivacyAccepted) {
-            alert("Please accept the Terms and Privacy Policy to proceed.");
+            setErrorMessage("Please accept the Terms and Privacy Policy to proceed.");
             return;
         }
 
@@ -58,13 +65,13 @@ export default function SignupAgentStep1() {
         });
 
         if (authError) {
-            alert(`Error during sign-up: ${authError.message}`);
+            setErrorMessage(`Error during sign-up: ${authError.message}`);
             return;
         }
 
         const userId = authData?.user?.id;
         if (!userId) {
-            alert("User ID is missing after sign-up.");
+            setErrorMessage("User ID is missing after sign-up.");
             return;
         }
 
@@ -83,7 +90,7 @@ export default function SignupAgentStep1() {
             }]);
 
         if (insertError) {
-            alert(`Error saving agent data: ${insertError.message}`);
+            setErrorMessage(`Error saving agent data: ${insertError.message}`);
             return;
         }
 
@@ -104,6 +111,13 @@ export default function SignupAgentStep1() {
                         Please enter the same full name as it appears on your real estate license to ensure a smooth verification process.<br />
                         Additionally, please use your work email for this sign-up.
                     </p>
+
+                    {errorMessage && (
+                        <div className="text-red-600 text-sm text-center mt-4">
+                            {errorMessage}
+                        </div>
+                    )}
+
                     <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                         <div className="space-y-4">
                             <input
