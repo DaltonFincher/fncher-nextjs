@@ -6,7 +6,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 interface FormData {
     fullName: string;
-    licenseType: string; // License type: SL, BL
+    licenseType: string;
     licenseNumber: string;
     email: string;
     password: string;
@@ -27,15 +27,16 @@ export default function SignupAgentStep1() {
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.checked });
+        setFormData(prev => ({ ...prev, termsAndPrivacyAccepted: e.target.checked }));
     };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFormData({ ...formData, licenseType: e.target.value });
+        setFormData(prev => ({ ...prev, licenseType: e.target.value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +44,6 @@ export default function SignupAgentStep1() {
 
         const { fullName, licenseType, licenseNumber, email, password, termsAndPrivacyAccepted } = formData;
 
-        // Basic validation for required fields
         if (!fullName || !licenseNumber || !email || !password) {
             setErrorMessage("Please fill in all required fields.");
             return;
@@ -83,10 +83,10 @@ export default function SignupAgentStep1() {
                 license_number: fullLicenseNumber,
                 profile_picture: "",
                 agent_id: userId,
-                email_verified_at: null, // Add null to email_verified_at as placeholder
+                email_verified_at: null,
                 terms_accepted: true,
                 privacy_policy_accepted: true,
-                created_at: new Date().toISOString(), // Set the current timestamp
+                created_at: new Date().toISOString(),
             }]);
 
         if (insertError) {
@@ -106,6 +106,7 @@ export default function SignupAgentStep1() {
                     <div className="flex justify-center mb-6">
                         <img src="/Fncherlogo1.png" alt="Fncher Logo" className="h-24" />
                     </div>
+
                     <h2 className="text-center text-3xl font-semibold text-gray-800">Sign Up as an Agent</h2>
                     <p className="text-center text-sm text-gray-600 opacity-70">
                         Please enter the same full name as it appears on your real estate license to ensure a smooth verification process.<br />
@@ -127,7 +128,7 @@ export default function SignupAgentStep1() {
                                 onChange={handleChange}
                                 required
                                 placeholder="Full Name"
-                                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
+                                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition"
                             />
 
                             <div className="flex space-x-4">
@@ -135,7 +136,7 @@ export default function SignupAgentStep1() {
                                     name="licenseType"
                                     value={formData.licenseType}
                                     onChange={handleSelectChange}
-                                    className="w-1/5 px-3 py-2 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
+                                    className="w-1/5 px-3 py-2 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition"
                                 >
                                     <option value="SL">SL</option>
                                     <option value="BL">BL</option>
@@ -147,7 +148,7 @@ export default function SignupAgentStep1() {
                                     onChange={handleChange}
                                     required
                                     placeholder="Real Estate License Number"
-                                    className="w-4/5 px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
+                                    className="w-4/5 px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition"
                                 />
                             </div>
 
@@ -158,7 +159,7 @@ export default function SignupAgentStep1() {
                                 onChange={handleChange}
                                 required
                                 placeholder="Email Address"
-                                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
+                                className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition"
                             />
 
                             <div className="relative">
@@ -169,7 +170,7 @@ export default function SignupAgentStep1() {
                                     onChange={handleChange}
                                     required
                                     placeholder="Password"
-                                    className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition ease-in-out duration-200"
+                                    className="w-full px-4 py-3 rounded-md border border-gray-300 text-gray-900 focus:ring-2 focus:ring-indigo-500 shadow-sm transition"
                                 />
                                 <div
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
@@ -200,7 +201,7 @@ export default function SignupAgentStep1() {
 
                         <button
                             type="submit"
-                            className="w-full py-3 px-6 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition ease-in-out duration-200"
+                            className="w-full py-3 px-6 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition"
                         >
                             Next
                         </button>
