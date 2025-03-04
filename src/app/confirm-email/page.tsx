@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { supabase } from "@utils/supabaseClient";
+import { supabase } from "@utils/supabaseClient";  // Only one import
 
 // 🔥 Force Dynamic Rendering (Fixes the Vercel Build Error)
 export const dynamic = "force-dynamic";
@@ -29,13 +29,13 @@ export default function ConfirmEmail() {
           setStatus("Email confirmed! Redirecting you to login...");
           setTimeout(() => {
             window.location.href = "/login";
-          }, 2000);
+          }, 2000);  // Delay just for better UX
         }
       });
     } else {
       setStatus("Invalid or missing verification data.");
     }
-  }, [searchParams]);
+  }, [searchParams]);  // Depend directly on searchParams
 
   return (
     <div className="p-6">
