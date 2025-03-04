@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { supabase } from "@utils/supabaseClient";  // Your existing client
+import { supabase } from "@utils/supabaseClient";
+
+// 🔥 Force Dynamic Rendering (Fixes the Vercel Build Error)
+export const dynamic = "force-dynamic";
 
 export default function ConfirmEmail() {
   const searchParams = useSearchParams();
-
   const [status, setStatus] = useState("Verifying your email...");
 
   useEffect(() => {
@@ -27,13 +29,13 @@ export default function ConfirmEmail() {
           setStatus("Email confirmed! Redirecting you to login...");
           setTimeout(() => {
             window.location.href = "/login";
-          }, 2000);  // Delay just for better UX
+          }, 2000);
         }
       });
     } else {
       setStatus("Invalid or missing verification data.");
     }
-  }, [searchParams]);  // Depend directly on searchParams
+  }, [searchParams]);
 
   return (
     <div className="p-6">
