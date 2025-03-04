@@ -7,8 +7,8 @@ import { supabase } from "@utils/supabaseClient"; // Your Supabase client
 export default function ConfirmEmail() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("Verifying your email...");
-  const token = searchParams.get("token"); // Get the token from the URL
-  const email = searchParams.get("email"); // Get the email from the URL
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
 
   useEffect(() => {
     if (token && email) {
@@ -36,7 +36,7 @@ export default function ConfirmEmail() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h1 className="text-2xl font-bold text-center mb-4">{status}</h1>
-        {/* You can add any additional helpful content here */}
+        {/* Add any additional helpful content here */}
       </div>
     </div>
   );
