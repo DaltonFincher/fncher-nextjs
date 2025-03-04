@@ -1,36 +1,43 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@utils/supabaseClient";  // Your existing client
 
 export default function ConfirmEmail() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const email = searchParams.get("email"); // Extract email as well
-  const type = searchParams.get("type");
+
+  const [status, setStatus] = useState("Verifying your email...");
 
   useEffect(() => {
+    const token = searchParams.get("token");
+    const email = searchParams.get("email");
+    const type = searchParams.get("type");
+
     if (type === "signup" && token && email) {
-      // Call supabase.auth.verifyOtp() with token and email
       supabase.auth.verifyOtp({
         token: token as string,
         email: email as string,
-        type: "signup", // or "email", depending on what you need
+        type: "signup",
       }).then(({ error }) => {
         if (error) {
+          setStatus("There was an error verifying your email.");
           alert("There was an error verifying your email.");
         } else {
-          alert("Email confirmed! You can now log in.");
-          window.location.href = "/login"; // Redirect after success
+          setStatus("Email confirmed! Redirecting you to login...");
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);  // Delay just for better UX
         }
       });
+    } else {
+      setStatus("Invalid or missing verification data.");
     }
-  }, [token, email, type]);
+  }, [searchParams]);  // Depend directly on searchParams
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Verifying your email...</h1>
+      <h1 className="text-2xl font-bold">{status}</h1>
     </div>
   );
 }
