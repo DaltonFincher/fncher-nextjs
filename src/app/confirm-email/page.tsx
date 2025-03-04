@@ -11,10 +11,16 @@ export default function ConfirmEmail() {
   const email = searchParams.get("email");
 
   useEffect(() => {
-    if (token && email) {
-      // Call Supabase's verifyOtp method to confirm the email
-      supabase.auth.verifyOtp({ token, email, type: "signup" })
-        .then(({ error }) => {
+    const confirmEmail = async () => {
+      if (token && email) {
+        try {
+          // Call Supabase's verifyOtp method to confirm the email
+          const { error } = await supabase.auth.verifyOtp({
+            token,
+            email,
+            type: "signup", // Sign up confirmation type
+          });
+
           if (error) {
             setStatus("There was an error verifying your email.");
           } else {
@@ -23,13 +29,15 @@ export default function ConfirmEmail() {
               window.location.href = "/login"; // Redirect after success
             }, 2000); // Optional delay for better UX
           }
-        })
-        .catch(() => {
+        } catch (error) {
           setStatus("Invalid or expired verification link.");
-        });
-    } else {
-      setStatus("Invalid or missing verification data.");
-    }
+        }
+      } else {
+        setStatus("Invalid or missing verification data.");
+      }
+    };
+
+    confirmEmail();
   }, [token, email]);
 
   return (
