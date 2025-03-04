@@ -7,12 +7,12 @@ import { supabase } from "@utils/supabaseClient"; // Your Supabase client
 export default function ConfirmEmail() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState("Verifying your email...");
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
+  const token = searchParams.get("token"); // Get the token from the URL
+  const email = searchParams.get("email"); // Get the email from the URL
 
   useEffect(() => {
     if (token && email) {
-      // Call Supabase's verifyOTP method to confirm the email
+      // Call Supabase's verifyOtp method to confirm the email
       supabase.auth.verifyOtp({ token, email, type: "signup" })
         .then(({ error }) => {
           if (error) {
@@ -36,7 +36,7 @@ export default function ConfirmEmail() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h1 className="text-2xl font-bold text-center mb-4">{status}</h1>
-        {/* Add any additional helpful content here */}
+        {/* You can add any additional helpful content here */}
       </div>
     </div>
   );
