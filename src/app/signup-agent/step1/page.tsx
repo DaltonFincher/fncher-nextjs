@@ -76,9 +76,9 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        // Insert data into the pending_agents table
+        // Insert data into the agents_pending table
         const { error: insertError } = await supabase
-            .from('pending_agents')
+            .from('agents_pending')  // Ensure we're using the correct table
             .insert([{
                 email,
                 full_name: fullName,
