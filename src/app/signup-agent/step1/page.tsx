@@ -56,7 +56,6 @@ export default function SignupAgentStep1() {
 
         const fullLicenseNumber = `${licenseType}${licenseNumber}`;
 
-        // Sign up the user
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
@@ -76,22 +75,21 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        // Insert data into the agents_pending table
+        // Insert into agents_pending table
         const { error: insertError } = await supabase
-            .from('agents_pending')  // Ensure we're using the correct table
+            .from('agents_pending')
             .insert([{
+                id: userId, // `id` is the agent's UUID (matches auth user ID)
                 email,
                 full_name: fullName,
                 license_number: fullLicenseNumber,
-                profile_picture: "",  // Assuming profile picture will be uploaded later
-                agent_id: userId,
-                email_verified_at: null,
+                profile_picture: "",  // Profile picture uploaded later
+                agent_id: userId,  // Matches auth user ID (redundant but keeps structure clean)
+                email_verified_at: null,  // This gets set later when verified
                 terms_accepted: true,
                 privacy_policy_accepted: true,
                 created_at: new Date().toISOString(),
-                verified: false,  // Initially, the agent is not verified
-                verification_token: "",  // Will be generated and set during verification
-                verification_expiry: null,  // Will be set when verification expires
+                verified: false  // Manual verification later
             }]);
 
         if (insertError) {
@@ -99,7 +97,6 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        // Redirect to waiting page
         window.location.href = "/waiting";
     };
 
