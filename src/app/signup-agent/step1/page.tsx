@@ -89,6 +89,9 @@ export default function SignupAgentStep1() {
                 terms_accepted: true,
                 privacy_policy_accepted: true,
                 created_at: new Date().toISOString(),
+                verified: false,  // Initially, the agent is not verified
+                verification_token: "",  // Will be generated and set during verification
+                verification_expiry: null,  // Will be set when verification expires
             }]);
 
         if (insertError) {
