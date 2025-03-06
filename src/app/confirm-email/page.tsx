@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@utils/supabaseClient';
@@ -29,7 +31,7 @@ export default function ConfirmEmail() {
     };
 
     handleEmailConfirmation();
-  }, [router, type, token]); // <--- added type and token to dependencies
+  }, [router, type, token]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4D6575] to-[#E8F1F5]">
