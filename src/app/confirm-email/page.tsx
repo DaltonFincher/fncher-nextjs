@@ -8,24 +8,19 @@ export default function ConfirmEmail() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const type = searchParams.get('type');
+  const token = searchParams.get('token');
+
   useEffect(() => {
     const handleEmailConfirmation = async () => {
-      const type = searchParams.get('type');
-      const token = searchParams.get('token');
-
       if (type === 'signup' && token) {
-        // Supabase will exchange this token for a session
         const { error } = await supabase.auth.exchangeCodeForSession(token);
-
         if (error) {
           console.error('Error confirming email:', error.message);
-          return; // Optionally show an error message
+          return;
         }
-
-        // After successful email confirmation and login, redirect to waiting page
         router.push('/waiting');
       } else {
-        // Optional: If they manually visit this page (not from email link), check if they are already logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           router.push('/waiting');
@@ -34,7 +29,7 @@ export default function ConfirmEmail() {
     };
 
     handleEmailConfirmation();
-  }, [router, searchParams]);
+  }, [router, type, token]); // <--- added type and token to dependencies
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#4D6575] to-[#E8F1F5]">
