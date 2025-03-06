@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { supabase } from "@utils/supabaseClient";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
 interface FormData {
     fullName: string;
@@ -25,6 +26,7 @@ export default function SignupAgentStep1() {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
+    const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -41,6 +43,7 @@ export default function SignupAgentStep1() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage("");
 
         const { fullName, licenseType, licenseNumber, email, password, termsAndPrivacyAccepted } = formData;
 
@@ -60,7 +63,7 @@ export default function SignupAgentStep1() {
             email,
             password,
             options: {
-                emailRedirectTo: `${window.location.origin}/confirm-email`
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/confirm-email`
             }
         });
 
@@ -71,25 +74,24 @@ export default function SignupAgentStep1() {
 
         const userId = authData?.user?.id;
         if (!userId) {
-            setErrorMessage("User ID is missing after sign-up.");
+            setErrorMessage("Something went wrong. No user ID returned after sign-up.");
             return;
         }
 
-        // Insert into agents_pending table
         const { error: insertError } = await supabase
             .from('agents_pending')
             .insert([{
-                id: userId, // `id` is the agent's UUID (matches auth user ID)
+                id: userId,
                 email,
                 full_name: fullName,
                 license_number: fullLicenseNumber,
-                profile_picture: "",  // Profile picture uploaded later
-                agent_id: userId,  // Matches auth user ID (redundant but keeps structure clean)
-                email_verified_at: null,  // This gets set later when verified
+                profile_picture: "",
+                agent_id: userId,
+                email_verified_at: null,
                 terms_accepted: true,
                 privacy_policy_accepted: true,
                 created_at: new Date().toISOString(),
-                verified: false  // Manual verification later
+                verified: false
             }]);
 
         if (insertError) {
@@ -97,7 +99,7 @@ export default function SignupAgentStep1() {
             return;
         }
 
-        window.location.href = "/waiting";
+        router.push("/waiting");
     };
 
     return (
